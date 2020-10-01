@@ -20,7 +20,7 @@ after_success:
     - docker build -t davidvolentlindberg/fibonacci-worker ./worker
 
     # 5) Push all to docker hub
-    # Log in to the docker CLI / not put creds directly here!
+    # Log in to the docker CLI / not put creds directly here (they are set in Travis UI)
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
     # Take those images and push them to docker hub
     - docker push davidvolentlindberg/fibonacci-client
