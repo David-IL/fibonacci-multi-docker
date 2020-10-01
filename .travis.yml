@@ -1,0 +1,29 @@
+language: generic
+sudo: required
+services:
+    # 1) Specify docker as dependency
+    - docker
+
+before_install:
+    # 2) Build test version of React project - note ./client for build context
+    - docker build -t davidvolentlindberg/react-test -f ./client/Dockerfile.dev ./client
+
+scripts:
+    # 3) Run tests
+    - docker run -e CI=true davidvolentlindberg/react-test npm test
+
+after_success:
+    # 4) Build prod versions of all projects
+    - docker build -t davidvolentlindberg/fibonacci-client ./client
+    - docker build -t davidvolentlindberg/fibonacci-nginx ./nginx
+    - docker build -t davidvolentlindberg/fibonacci-server ./server
+    - docker build -t davidvolentlindberg/fibonacci-worker ./worker
+
+    # 5) Push all to docker hub
+    # Log in to the docker CLI / not put creds directly here!
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take those images and push them to docker hub
+    - docker push davidvolentlindberg/fibonacci-client
+    - docker push davidvolentlindberg/fibonacci-nginx
+    - docker push davidvolentlindberg/fibonacci-server
+    - docker push davidvolentlindberg/fibonacci-worker
